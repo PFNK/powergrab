@@ -17,7 +17,7 @@ public enum Direction {
 	WNW(-0.0003 * Math.cos(Math.toRadians(22.5)), 0.0003 * Math.sin(Math.toRadians(22.5))), 
 	NW(-0.0003 * Math.cos(Math.toRadians(45)), 0.0003 * Math.sin(Math.toRadians(45))), 
 	NNW(-0.0003 * Math.cos(Math.toRadians(67.5)), 0.0003 * Math.sin(Math.toRadians(67.5)));
-// use these when finding direction to move somewhere 
+
 	private final double latitude;
 	private final double longitude;
 
@@ -32,5 +32,58 @@ public enum Direction {
 	
 	public double longitude() {
 		return longitude;
+	}
+
+	public double to_anticlock_angle(){
+		if(this.name().equals(Direction.E)){
+			return 0;
+		}
+		if(this.name().equals(Direction.ENE)){
+			return 22.5;
+		}
+		if(this.name().equals(Direction.NE)){
+			return 45;
+		}
+		if(this.name().equals(Direction.NNE)){
+			return 67.5;
+		}
+		if(this.name().equals(Direction.N)){
+			return 90;
+		}
+		if(this.name().equals(Direction.NNW)){
+			return 112.5;
+		}
+		if(this.name().equals(Direction.NW)){
+			return 135;
+		}
+		if(this.name().equals(Direction.WNW)){
+			return 157.5;
+		}
+		if(this.name().equals(Direction.W)){
+			return 180;
+		}
+		if(this.name().equals(Direction.WSW)){
+			return 202.5;
+		}
+		if(this.name().equals(Direction.SW)){
+			return 225;
+		}
+		if(this.name().equals(Direction.SSW)){
+			return 247.5;
+		}
+		if(this.name().equals(Direction.S)){
+			return 270;
+		}
+		if(this.name().equals(Direction.SSE)){
+			return 292.5;
+		}
+		if(this.name().equals(Direction.SE)){
+			return 315;
+		}
+		else {
+			return 337.5;
+		}
+
+
 	}
 }

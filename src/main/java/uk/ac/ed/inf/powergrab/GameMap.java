@@ -16,13 +16,13 @@ import com.google.gson.JsonPrimitive;
 import com.mapbox.geojson.*;
 import org.json.simple.JSONObject;
 
-public class Map {
+public class GameMap {
 	String[] date;
 	URL mapUrl;
 	FeatureCollection features;
 	Random rnd;
 	
-	public Map(String[] date, Random rnd) throws IOException {
+	public GameMap(String[] date, Random rnd) throws IOException {
 		this.date = date;
 		this.rnd = rnd;
 		String mapString = String.format("http://homepages.inf.ed.ac.uk/stg/powergrab/%s/%s/%s/powergrabmap.geojson", date[2], date[1], date[0]);
@@ -80,15 +80,60 @@ public class Map {
 			}
 		}
 	}
-	
-//	FeatureCollection.fromJson(mapSource) returns a FeatureCollection.
-//	• If fc is a FeatureCollection then fc.features() is a list of Feature objects.
-//	• If f is a Feature then f.geometry() is a Geometry object.
-//	• If g is a Geometry object, it may also be a Point.
-//	• If p is a Point, then p.coordinates() is a list of double precision numbers.
-//	• If f is a Feature with a property coins, then
-//	f.getProperty(“coins”) is a JsonElement.
-//	• We can convert a JsonElement using methods such as getAsString() and getAsFloat().
-	
-	
+
+	public Direction get_direction_from_angle(double angle){
+		if(angle < 0){
+			angle += 360;
+		}
+
+	    if(angle <= 11.25 || angle > 348.75){
+	        return Direction.E;
+        }
+        if(angle <= 33.75 && angle > 11.25){
+            return Direction.ENE;
+        }
+        if(angle <= 56.25 && angle > 33.75){
+            return Direction.NE;
+        }
+        if(angle <= 78.75 && angle > 56.25){
+            return Direction.NNE;
+        }
+        if(angle <= 101.25 && angle > 78.75){
+            return Direction.N;
+        }
+        if(angle <= 123.75 && angle > 101.25){
+            return Direction.NNW;
+        }
+        if(angle <= 146.25 && angle > 123.75){
+            return Direction.NW;
+        }
+        if(angle <= 168.75 && angle > 146.25){
+            return Direction.WNW;
+        }
+        if(angle <= 191.25 && angle > 168.75){
+            return Direction.W;
+        }
+        if(angle <= 213.75 && angle > 191.25){
+            return Direction.WSW;
+        }
+        if(angle <= 236.25 && angle > 213.75){
+            return Direction.SW;
+        }
+        if(angle <= 258.75 && angle > 236.25){
+            return Direction.SSW;
+        }
+        if(angle <= 281.25 && angle > 258.75){
+            return Direction.S;
+        }
+        if(angle <= 303.75 && angle > 281.25){
+            return Direction.SSE;
+        }
+        if(angle <= 326.25 && angle > 303.75){
+            return Direction.SE;
+        }
+        if(angle <= 348.75 && angle > 326.25) {
+            return Direction.ESE;
+        }
+        else return null;
+    }
 }
