@@ -24,11 +24,16 @@ public class StatelessDrone extends Drone {
 		position = position.nextPosition(next_dir);
 		map.position = position;
 		map.path.add(position);
+
 		coins += map.closest_coins;
 		power += map.closest_power;
 
 		moves++;
 		power -= 1.25;
+
+		map.drone_energy = power;
+		map.drone_coins = coins;
 	}
+
 	
 }

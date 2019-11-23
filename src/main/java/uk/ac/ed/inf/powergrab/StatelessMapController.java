@@ -10,24 +10,30 @@ import com.mapbox.geojson.Point;
 
 public class StatelessMapController {
 
-	private GameMap gameMap;
+	private GameStateMap gameStateMap;
 	Position position;
 	ArrayList<Position> path;
-	double closest_coins = 0.0;
-	double closest_power = 0.0;
+	double closest_coins;
+	double closest_power;
 	Direction last_dir;
+	double drone_coins;
+	double drone_energy;
 
 	
-	public StatelessMapController(GameMap gameMap, Position position) {
-		this.gameMap = gameMap;
+	public StatelessMapController(GameStateMap gameStateMap, Position position) {
+		this.gameStateMap = gameStateMap;
 		this.position = position;
 		path = new ArrayList<Position>();
 		last_dir = null;
+		closest_coins = 0;
+		closest_power = 0;
+		drone_coins = 0;
+		drone_energy = 250;
 	}
 	
 	public Direction get_direction() { 
 		// store only closest red, closest green and the rest 
-		HashMap<Direction, Position> possible_positions = gameMap.get_possible_positions(position);
+		HashMap<Direction, Position> possible_positions = gameStateMap.get_possible_positions(position);
 		HashMap<String, String> closest_stations = new HashMap<String,String>();
 		
 		HashMap<String, ArrayList<Direction>> motions = new HashMap<String,ArrayList<Direction>>();
@@ -41,13 +47,13 @@ public class StatelessMapController {
         // iterate through all possible directions
 		for(Entry<Direction, Position> next_position: possible_positions.entrySet()) { // n<=16						
 			// iterate though all features
-			for (Feature f: gameMap.features.features()){ // m=50
+			for (Feature f: gameStateMap.features.features()){ // m=50
 				Geometry g = f.geometry();
 				if(g.type().equals("Point")){
 					
 					Point p = (Point) g;
 					Position station = new Position(p.coordinates().get(1),p.coordinates().get(0));
-					double distance = gameMap.calculate_distance(next_position.getValue(), station);
+					double distance = gameStateMap.calculate_distance(next_position.getValue(), station);
 				
 					if(distance > 0.00025) { //skip unreachable ones - include bad directions
 						if(!safe_dir.contains(next_position.getKey())){
@@ -95,19 +101,19 @@ public class StatelessMapController {
 		motions.put("red", red);
 		motions.put("safe", safe_dir);
 
-		Direction d = choose_closest_station(motions, coins_energy,closest_stations);
+		Direction d = choose_closest_station(motions, coins_energy, closest_stations);
 		last_dir = d;
 		return d;
 	}
 	
 	
-	public Direction choose_closest_station(HashMap<String, ArrayList<Direction>> motions, HashMap<String,Double> coins_power, HashMap<String, String> closest_stations) {
+	public Direction choose_closest_station(HashMap<String, ArrayList<Direction>> motions, HashMap<String, Double> coins_power, HashMap<String, String> closest_stations) {
 		Direction d = null;
 		if(motions.get("green").get(0) != null) {
 			d = motions.get("green").get(0);
 			closest_coins = coins_power.get("green_coins");
 			closest_power = coins_power.get("green_power");
-			gameMap.update_station(closest_stations.get("green_station"),closest_coins,closest_power);
+			gameStateMap.update_station(closest_stations.get("green_station"), drone_coins, drone_energy);
 		}
 		else if(motions.get("safe").get(0) != null) {
 			d = get_rand_direction(motions.get("safe"));
@@ -117,14 +123,14 @@ public class StatelessMapController {
 				d = motions.get("red").get(0);
 				closest_coins = coins_power.get("red_coins");
 				closest_power = coins_power.get("red_power");
-				gameMap.update_station(closest_stations.get("red_station"),closest_coins,closest_power);
+				gameStateMap.update_station(closest_stations.get("red_station"), drone_coins, drone_energy);
 			}
 		}
 		else {
 			d = motions.get("red").get(0);
 			closest_coins = coins_power.get("red_coins");
 			closest_power = coins_power.get("red_power");
-			gameMap.update_station(closest_stations.get("red_station"),closest_coins,closest_power);
+			gameStateMap.update_station(closest_stations.get("red_station"), drone_coins, drone_energy);
 		}
 		return d;	
 	}
@@ -137,7 +143,7 @@ public class StatelessMapController {
 		}
 		Direction[] arr = new Direction[dirs.size()]; 
         arr = dirs.toArray(arr);
-		Direction rand_dir = gameMap.get_random_direction(arr.length,arr);
+		Direction rand_dir = gameStateMap.get_random_direction(arr.length,arr);
 		
 		Position next = position.nextPosition(rand_dir);
 		if(next.inPlayArea()){
@@ -152,6 +158,6 @@ public class StatelessMapController {
 		
 	public void add_path() {
 		Position[] arr = new Position[path.size()];
-		gameMap.add_flight_path(path.toArray(arr));
+		gameStateMap.add_flight_path(path.toArray(arr));
 	}
 }

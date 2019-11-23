@@ -16,13 +16,13 @@ import com.google.gson.JsonPrimitive;
 import com.mapbox.geojson.*;
 import org.json.simple.JSONObject;
 
-public class GameMap {
+public class GameStateMap {
 	String[] date;
 	URL mapUrl;
 	FeatureCollection features;
 	Random rnd;
 	
-	public GameMap(String[] date, Random rnd) throws IOException {
+	public GameStateMap(String[] date, Random rnd) throws IOException {
 		this.date = date;
 		this.rnd = rnd;
 		String mapString = String.format("http://homepages.inf.ed.ac.uk/stg/powergrab/%s/%s/%s/powergrabmap.geojson", date[2], date[1], date[0]);
@@ -32,8 +32,8 @@ public class GameMap {
 	        throw new RuntimeException(e);
 	    }
 		HttpURLConnection conn = (HttpURLConnection) this.mapUrl.openConnection();
-		conn.setReadTimeout(10000); // milliseconds
-		conn.setConnectTimeout(15000); // milliseconds
+		conn.setReadTimeout(10000);
+		conn.setConnectTimeout(15000);
 		conn.setRequestMethod("GET");
 		conn.setDoInput(true);
 		conn.connect();
@@ -74,8 +74,15 @@ public class GameMap {
 	public void update_station(String station_id, double coins, double power){
 		for(Feature f : features.features()){
 			if(f.getProperty("id").getAsString().equals(station_id)){
-				f.addNumberProperty("coins", f.getProperty("coins").getAsDouble() - coins);
-				f.addNumberProperty("power", f.getProperty("power").getAsDouble() - power);
+				//take all positive coins/power
+				if(f.getProperty("marker-symbol").getAsString().equals("lighthouse")) {
+					f.addNumberProperty("coins", 0);
+					f.addNumberProperty("power", 0);
+					break;
+				}
+				//add drone's coins/power to negative ones
+				f.addNumberProperty("coins", f.getProperty("coins").getAsDouble() + coins);
+				f.addNumberProperty("power", f.getProperty("power").getAsDouble() + power);
 				break;
 			}
 		}

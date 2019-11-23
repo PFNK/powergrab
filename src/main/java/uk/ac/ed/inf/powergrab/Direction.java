@@ -35,49 +35,49 @@ public enum Direction {
 	}
 
 	public double to_anticlock_angle(){
-		if(this.name().equals(Direction.E)){
+		if(this.name().equals("E")){
 			return 0;
 		}
-		if(this.name().equals(Direction.ENE)){
+		if(this.name().equals("ENE")){
 			return 22.5;
 		}
-		if(this.name().equals(Direction.NE)){
+		if(this.name().equals("NE")){
 			return 45;
 		}
-		if(this.name().equals(Direction.NNE)){
+		if(this.name().equals("NNE")){
 			return 67.5;
 		}
-		if(this.name().equals(Direction.N)){
+		if(this.name().equals("N")){
 			return 90;
 		}
-		if(this.name().equals(Direction.NNW)){
+		if(this.name().equals("NNW")){
 			return 112.5;
 		}
-		if(this.name().equals(Direction.NW)){
+		if(this.name().equals("NW")){
 			return 135;
 		}
-		if(this.name().equals(Direction.WNW)){
+		if(this.name().equals("WNW")){
 			return 157.5;
 		}
-		if(this.name().equals(Direction.W)){
+		if(this.name().equals("W")){
 			return 180;
 		}
-		if(this.name().equals(Direction.WSW)){
+		if(this.name().equals("WSW")){
 			return 202.5;
 		}
-		if(this.name().equals(Direction.SW)){
+		if(this.name().equals("SW")){
 			return 225;
 		}
-		if(this.name().equals(Direction.SSW)){
+		if(this.name().equals("SSW")){
 			return 247.5;
 		}
-		if(this.name().equals(Direction.S)){
+		if(this.name().equals("S")){
 			return 270;
 		}
-		if(this.name().equals(Direction.SSE)){
+		if(this.name().equals("SSE")){
 			return 292.5;
 		}
-		if(this.name().equals(Direction.SE)){
+		if(this.name().equals("SE")){
 			return 315;
 		}
 		else {
