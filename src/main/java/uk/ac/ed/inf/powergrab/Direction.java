@@ -1,5 +1,12 @@
 package uk.ac.ed.inf.powergrab;
 
+/**
+ * <h1>
+ *     Enum Direction that represents the change in latitude
+ *     and longitude for each sixteen directions that drone
+ *     can move in.
+ * </h1>
+ */
 public enum Direction {
 	N(0, 0.0003), 
 	NNE(0.0003 * Math.cos(Math.toRadians(22.5)), 0.0003 * Math.sin(Math.toRadians(22.5))), 
@@ -18,23 +25,30 @@ public enum Direction {
 	NW(-0.0003 * Math.cos(Math.toRadians(45)), 0.0003 * Math.sin(Math.toRadians(45))), 
 	NNW(-0.0003 * Math.cos(Math.toRadians(67.5)), 0.0003 * Math.sin(Math.toRadians(67.5)));
 
-	private final double latitude;
-	private final double longitude;
+	private final double changeOfLatitude;
+	private final double changeOfLongitude;
 
-	Direction(double longitude,double latitude) {
-		this.longitude = longitude;
-		this.latitude = latitude;
+	Direction(double changeOfLongitude, double changeOfLatitude) {
+		this.changeOfLongitude = changeOfLongitude;
+		this.changeOfLatitude = changeOfLatitude;
 	}
 
-	public double latitude() {
-		return latitude;
+	public double changeOfLatitude() {
+		return changeOfLatitude;
 	}
 	
-	public double longitude() {
-		return longitude;
+	public double changeOfLongitude() {
+		return changeOfLongitude;
 	}
 
-	public double to_anticlock_angle(){
+	/**
+	 * <p>
+	 *     This method transforms a Direction to the anti-clockwise angle.
+	 *     Starting at East which represents 0 angle.
+	 * </p>
+	 * @return double angle that is between East direction (0 angle) and given one
+	 */
+	public double toAnticlockwiseAngle(){
 		if(this.name().equals("E")){
 			return 0;
 		}
@@ -83,7 +97,5 @@ public enum Direction {
 		else {
 			return 337.5;
 		}
-
-
 	}
 }

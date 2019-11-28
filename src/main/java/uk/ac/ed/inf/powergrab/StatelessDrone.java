@@ -1,39 +1,51 @@
 package uk.ac.ed.inf.powergrab;
 
-
-//1. Initialise the drone state (position, seed, type);
-//2. Repeat
-//	2.1 Inspect the current state of the map, and current position;
-//	2.2 Calculate allowable moves of the drone;
-//	2.3 Decide in which direction to move;
-//	2.4 Move to your next position, update your position;
-//	2.5 Charge from the nearest changing station (if in range).
-//Until 250 moves, or insufficient energy to move.
-
+/**
+ * <h1>Stateless Drone - limited, memoryless version of the drone</h1>
+ * <p1>
+ *     Stateless drone only knows is current position on a map and can
+ *     only look one step ahead without remembering its previous moves.
+ *
+ *     Its decision of the next move can only be based on information
+ *     about the charging stations which are within range of the
+ *     sixteen positions where the drone can be after one move.
+ *
+ *     Drone is trying to move towards charging stations with positive
+ *     value, while avoiding charging stations with negative value
+ *     if possible.
+ * </p1>
+ */
 public class StatelessDrone extends Drone {
-	StatelessMapController map;
-	// stateless is memoryless - it only knows about stations that are within the range
-	
-	public StatelessDrone(Position initial_position, StatelessMapController m) {
-		super(initial_position);
-		this.map = m;
+	StatelessMapController mapController;
+
+	public StatelessDrone(Position initialPosition, StatelessMapController mapController) {
+		super(initialPosition);
+		this.mapController = mapController;
 	}
-	
+
+	/**
+	 * <p>
+	 *     This method is called for each move of a drone.
+	 *     Firstly it gets the optimal direction from
+	 *     the its StatelessMapController which scans
+	 *     the map for the drone.
+	 *     After the move, drone updates its fields,
+	 *     as well as its fields that are stored in
+	 *     StatelessMapController.
+	 * </p>
+	 */
 	public void move() {
-		Direction next_dir = map.get_direction();
-		position = position.nextPosition(next_dir);
-		map.position = position;
-		map.path.add(position);
+		Direction directionToMove = mapController.getDirectionToMove();
+		position = position.nextPosition(directionToMove);
+		mapController.position = position;
+		mapController.path.add(position);
 
-		coins += map.closest_coins;
-		power += map.closest_power;
-
+		coins += mapController.lastCollectedCoins;
+		power += mapController.lastCollectedPower;
 		moves++;
 		power -= 1.25;
 
-		map.drone_energy = power;
-		map.drone_coins = coins;
+		mapController.dronesPower = power;
+		mapController.dronesCoins = coins;
 	}
-
-	
 }

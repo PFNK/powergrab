@@ -10,53 +10,90 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
+/**
+ * <h1>Stateful Drone - "smart" version of the drone</h1>
+ * <p>
+ *     Stateful drone by definition has no limitations, it is able to
+ *     remember the whole map of play area and any of its previous moves.
+ *
+ *     It creates a plan before moving and then follows it.
+ *     Path consists of green stations only, it avoids red ones while moving.
+ *
+ *     StatefulDrone extends Drone class which stores additional fields:
+ *     coins, power, position and moves
+ * </p>
 
+ */
 public class StatefulDrone extends Drone {
+    /**
+     * The whole GameStateMap created by Game.
+     */
     GameStateMap gameStateMap;
-    Queue<Feature> plan;
-    ArrayList<Position> path;
-    Direction last_dir;
-    PrintWriter writer;
+    /**
+     * Drone's game strategy = queue of green stations which StatefulDrone follows.
+     */
+    Queue<Feature> planToFollow;
+    /**
+     * Previous positions of the drone, which are later added to the GameStateMap.
+     */
+    ArrayList<Position> previousPositions;
+    /**
+     * Last direction that the drone moved.
+     */
+    Direction lastDirectionUsed;
+    /**
+     * Writer used to write Drone's moves to the .txt file.
+     */
+    PrintWriter pathTxtWriter;
 
 
-    public StatefulDrone(Position initial_position, GameStateMap gameStateMap, String file) throws FileNotFoundException, UnsupportedEncodingException {
-        super(initial_position);
-        this.plan = new LinkedList<>();
+    public StatefulDrone(Position initialPosition, GameStateMap gameStateMap, String file) throws FileNotFoundException, UnsupportedEncodingException {
+        super(initialPosition);
+        this.planToFollow = new LinkedList<>();
         this.gameStateMap = gameStateMap;
-        path = new ArrayList<Position>();
-        last_dir = null;
-        find_plan();
-        this.writer = new PrintWriter(file, "UTF-8");
+        previousPositions = new ArrayList<Position>();
+        lastDirectionUsed = null;
+        findGamePlan();
+        this.pathTxtWriter = new PrintWriter(file, "UTF-8");
     }
 
+    /**
+     * <p>
+     *     Method used to move the drone -> to play the game with this drone.
+     *     It is called in a loop until the drone make 250 moves or run out of power.
+     *     Each call of a move method means move to the next station in the queue plan,
+     *     so move() runs until the next green station is reached.
+     * </p>
+     */
+
     public void move() {
-        if(plan.size() == 0){
-            move_randomly();
+        if(planToFollow.size() == 0){
+            moveRandomly();
             return;
         }
-        Feature target = plan.peek();
+        Feature target = planToFollow.peek();
         Point p = (Point) target.geometry();
-        Position target_pos = new Position(p.coordinates().get(1), p.coordinates().get(0));
-        double distance = gameStateMap.calculate_distance(position, target_pos);
+        Position targetPosition = new Position(p.coordinates().get(1), p.coordinates().get(0));
+        double distance = gameStateMap.calculateDistance(position, targetPosition);
 
         while(distance > 0.00025){
-            Direction dir = get_direction_to_target(target);
-            boolean is_safe = check_safety(dir);
-            if(!is_safe) {
-                move_to_avoid_red(target, new ArrayList<Direction>());
+            Direction dir = getDirectionToTarget(target);
+            boolean isSafe = checkSafetyOfDirection(dir);
+            if(!isSafe) {
+                moveToAvoidRedStation(target);
             }
 //            if(power<=1.25) break;
             if(!position.nextPosition(dir).inPlayArea()){
-                double less_steeper_angle = dir.to_anticlock_angle() - 30;
-                dir = gameStateMap.get_direction_from_angle(less_steeper_angle);
+                double lessSteepAngle = dir.toAnticlockwiseAngle() - 30;
+                dir = gameStateMap.getDirectionFromAngle(lessSteepAngle);
             }
             Position prev = position;
             power -= 1.25;
-            last_dir = dir;
-            write_move(prev);
+            lastDirectionUsed = dir;
+            writeMoveToFile(prev);
             position = position.nextPosition(dir);
-            path.add(position);
-            distance = gameStateMap.calculate_distance(position, target_pos);
+            previousPositions.add(position);
+            distance = gameStateMap.calculateDistance(position, targetPosition);
             moves++;
 
         }
@@ -65,61 +102,78 @@ public class StatefulDrone extends Drone {
         power += target.getProperty("power").getAsDouble();
 
 //        take all coins/energy from it
-        gameStateMap.update_station(target.getProperty("id").getAsString(), 0, 0);
-        plan.remove();
+        gameStateMap.updateStation(target.getProperty("id").getAsString(), 0, 0);
+        planToFollow.remove();
     }
 
-    private boolean check_safety(Direction d){
-        Position next_pos = position.nextPosition(d);
-        Feature red_in_range = null;
-        Feature green_in_range = null;
-        double red_dist = 10;
-        double green_dist = 10;
+    /**
+     * <p>
+     *     This is a method used to check if moving in a given direction
+     *     is safe for the drone on not.
+     *     Safe means that there isn't any red station reachable at the next
+     *     position after moving in the given direction.
+     * </p>
+     * @param dir the direction which drone wants to know if is safe to move
+     * @return boolean which says if the direction is safe or not
+     */
+    private boolean checkSafetyOfDirection(Direction dir){
+        Position nextPosition = position.nextPosition(dir);
+        Feature redStationInRange = null;
+        double redSmallestDistance = 10;
+        double greenSmallestDistance = 10;
         for(Feature f : gameStateMap.features.features()){
             if(!f.geometry().type().equals("Point")) continue;
             Point p = (Point) f.geometry();
-            Position station_pos = new Position(p.coordinates().get(1), p.coordinates().get(0));
-            double distance = gameStateMap.calculate_distance(next_pos, station_pos);
+            Position stationPosition = new Position(p.coordinates().get(1), p.coordinates().get(0));
+            double distance = gameStateMap.calculateDistance(nextPosition, stationPosition);
             if(distance <= 0.00025){
 //            get closest red and green
                 if(f.getProperty("marker-symbol").getAsString().equals("danger")){
-                    if(distance < red_dist) {
-                        red_dist = distance;
-                        red_in_range = f;
+                    if(distance < redSmallestDistance) {
+                        redSmallestDistance = distance;
+                        redStationInRange = f;
                     }
                 }
                 else {
-                    if (distance < green_dist) {
-                        green_dist = distance;
-                        green_in_range = f;
+                    if (distance < greenSmallestDistance) {
+                        greenSmallestDistance = distance;
                     }
                 }
             }
         }
-        if(red_in_range == null || green_dist < red_dist){
+        if(redStationInRange == null || greenSmallestDistance < redSmallestDistance){
             return true;
         }
         return false;
     }
 
-    private void move_to_avoid_red(Feature target, ArrayList<Direction> avoid_these_directions){
+    /**
+     * <p>
+     *     This method is used when the drone can't move in the desired direction.
+     *     It is used to avoid the red station that lies in the direction to target station.
+     *     To avoid this obstacle, drone moves left or right of the desired direction.
+     * </p>
+     * @param target Feature corresponding to drone's target = current head of a queue plan
+     * @return boolean which says if the direction is safe or not
+     */
+    private void moveToAvoidRedStation(Feature target){
 //        want to go in d direction - but its not safe - avoid by going to left/right
-        Direction d = get_direction_to_target(target);
+        Direction d = getDirectionToTarget(target);
 
-        if(avoid_red(d,90)) return; // try right direction
+        if(moveToSidesToAvoid(d,90)) return; // try right direction
 
-        if(avoid_red(d,-90)) return; // try left then
+        if(moveToSidesToAvoid(d,-90)) return; // try left then
 
 //      go back if previous don't work
-        double backward_angle = (d.to_anticlock_angle() - 180) % 360;
-        Direction move_backwards = gameStateMap.get_direction_from_angle(backward_angle);
-        Position prev = position;
+        double reverseAngle = (d.toAnticlockwiseAngle() - 180) % 360;
+        Direction moveBackwardsDirection = gameStateMap.getDirectionFromAngle(reverseAngle);
+        Position previousPosition = position;
         moves++;
         power -= 1.25;
-        write_move(prev);
-        position = position.nextPosition(move_backwards);
-        path.add(position);
-        move_to_avoid_red(target, avoid_these_directions);
+        writeMoveToFile(previousPosition);
+        position = position.nextPosition(moveBackwardsDirection);
+        previousPositions.add(position);
+        moveToAvoidRedStation(target);
 
 //
 ////        if(directions_to_move != null) {
@@ -167,121 +221,188 @@ public class StatefulDrone extends Drone {
 //        }
 ////        go back
 //        else{
-//            double backward_angle = (d.to_anticlock_angle() - 180) % 360;
-//            Direction move_backwards = gameStateMap.get_direction_from_angle(backward_angle);
+//            double reverseAngle = (d.to_anticlock_angle() - 180) % 360;
+//            Direction moveBackwards = gameStateMap.get_direction_from_angle(reverseAngle);
 //            avoid_these_directions.add(d);
 //            move_to_avoid_red(target, avoid_these_directions);
 //        }
     }
 
-    public boolean avoid_red(Direction target, int angle){
-        double right_side_angle = (target.to_anticlock_angle() + angle) % 360;
-        Direction move_to_r_side = gameStateMap.get_direction_from_angle(right_side_angle);
+    /**
+     * <p>
+     *     A method called from move_to_avoid_red method. This method moves
+     *     the drone in a direction of a given angle. It is always either right (90)
+     *     or left (-90) angle of the desired direction (direction to head of plan)
+     *     This method is called recursively until it is safe to move or until the
+     *     edge of a play area is reached.
+     * </p>
+     * @param target desired Direction which drone wants to move, but is not safe
+     * @param angle int angle that drone uses to avoid an obstacle, always 90 or -90
+     * @return boolean false if this method failed to avoid an obstacle by moving in
+     *                 direction of a given angle
+     */
+    public boolean moveToSidesToAvoid(Direction target, int angle){
+        double perpAngleToDesiredAngle = (target.toAnticlockwiseAngle() + angle) % 360;
+        Direction moveToPerpSide = gameStateMap.getDirectionFromAngle(perpAngleToDesiredAngle);
 
-//         if out of area of not safe, move left
-        if(!position.nextPosition(move_to_r_side).inPlayArea() || !check_safety(move_to_r_side)){
+        if(!position.nextPosition(moveToPerpSide).inPlayArea() || !checkSafetyOfDirection(moveToPerpSide)){
             return false;
         }
 
-        Position prev = position;
+        Position previousPosition = position;
         moves++;
         power -= 1.25;
-        write_move(prev);
-        position = position.nextPosition(move_to_r_side);
-        path.add(position);
-        check_greens();
+        position = position.nextPosition(moveToPerpSide);
+        writeMoveToFile(previousPosition);
+        previousPositions.add(position);
+        checkGreenStationsNearby();
 
-        if(check_safety(target)) return true;
-
-        return avoid_red(target, angle);
+        if(checkSafetyOfDirection(target)) return true;
+        return moveToSidesToAvoid(target, angle);
     }
 
-
-    public void check_greens(){
-        Feature closest_green = find_closest_green_station(gameStateMap.features, position);
-        Point p = (Point) closest_green.geometry();
-        Position station = new Position(p.coordinates().get(1), p.coordinates().get(0));
-        double distance = gameStateMap.calculate_distance(position, station);
+    /**
+     * <p>
+     *     A method used to check if the drone is near some other green stations
+     *     to which it moved by avoiding obstacles (red stations) while moving towards
+     *     the current head of a plan queue.
+     *     If there is such a green station, remove it from the plan queue and collect
+     *     its coins and power.
+     * </p>
+     */
+    public void checkGreenStationsNearby(){
+        Feature closestGreenStation = findClosestGreenStation(gameStateMap.features, position);
+        Point p = (Point) closestGreenStation.geometry();
+        Position stationPosition = new Position(p.coordinates().get(1), p.coordinates().get(0));
+        double distance = gameStateMap.calculateDistance(position, stationPosition);
         if(distance < 0.00025){
-            coins += closest_green.getProperty("coins").getAsDouble();
-            power += closest_green.getProperty("power").getAsDouble();
-            gameStateMap.update_station(closest_green.getProperty("id").getAsString(),0,0);
-            plan.remove(station);
+            coins += closestGreenStation.getProperty("coins").getAsDouble();
+            power += closestGreenStation.getProperty("power").getAsDouble();
+            gameStateMap.updateStation(closestGreenStation.getProperty("id").getAsString(),0,0);
+            planToFollow.remove(stationPosition);
         }
     }
 
+    /**
+     * <p>
+     *     Method used when initializing StatefulDrone.
+     *     Current strategy is to firstly, find a closest station to the current
+     *     position of a drone, add it to the queue (head of a queue) and after that,
+     *     find the closest station to the previously found station.
+     *     This creates a queue of Feature that represent the stations
+     *     which drone is going to follow when play() is called.
+     * </p>
+     */
+    public void findGamePlan(){
+        List<Feature> featureArrayList = new ArrayList<>(gameStateMap.features.features());
+        FeatureCollection stations = FeatureCollection.fromFeatures(featureArrayList);
+        Position position = this.position;
 
-    public void find_plan(){
-//        FeatureCollection stations = FeatureCollection.fromFeatures(gameMap.features.features());
-        List<Feature> b = new ArrayList<Feature>(gameStateMap.features.features());
-        FeatureCollection stations = FeatureCollection.fromFeatures(b);
-
-        Position pos = position;
         while(true){
-            Feature closest_station = find_closest_green_station(stations, pos);
-            if(closest_station == null){
+            Feature closestGreenStation = findClosestGreenStation(stations, position);
+            if(closestGreenStation == null){
                 break;
             }
-            plan.add(closest_station);
-            stations.features().remove(closest_station);
-            Point p = (Point) closest_station.geometry();
-            pos = new Position(p.coordinates().get(1), p.coordinates().get(0));
-
-
+            planToFollow.add(closestGreenStation);
+            stations.features().remove(closestGreenStation);
+            Point p = (Point) closestGreenStation.geometry();
+            position = new Position(p.coordinates().get(1), p.coordinates().get(0));
         }
     }
 
-    private Feature find_closest_green_station(FeatureCollection features, Position pos){
-        Feature closest_green_station = null;
-        double closest_distance = 100000;
-        for (Feature f: features.features()) { //
-            Geometry g = f.geometry();
-            if (g.type().equals("Point") && f.getProperty("marker-symbol").getAsString().equals("lighthouse")){
+    /**
+     * <p>
+     *     Method that is called to find the closest green station to the position
+     *     given, from the FeatureCollection given as parameters.
+     *     It iterates through all the features and simply stores the closest one.
+     * </p>
+     * @param features FeatureCollection from which it finds the closest one
+     * @param pos Position that is used to calculate distances
+     * @return Feature that represent the closest green station to the given Position
+     */
+    private Feature findClosestGreenStation(FeatureCollection features, Position pos){
+        Feature closestGreenStation = null;
+        double closestDistance = 10000;
+        for (Feature feature: features.features()) { //
+            Geometry g = feature.geometry();
+            if (g.type().equals("Point") && feature.getProperty("marker-symbol").getAsString().equals("lighthouse")){
                 Point p = (Point) g;
-                Position station = new Position(p.coordinates().get(1), p.coordinates().get(0));
-                double distance = gameStateMap.calculate_distance(pos, station);
-                if(distance < closest_distance){
-                    closest_distance = distance;
-                    closest_green_station = f;
+                Position stationPosition = new Position(p.coordinates().get(1), p.coordinates().get(0));
+                double distance = gameStateMap.calculateDistance(pos, stationPosition);
+                if(distance < closestDistance){
+                    closestDistance = distance;
+                    closestGreenStation = feature;
                 }
             }
         }
-        return closest_green_station;
+        return closestGreenStation;
     }
 
-    private Direction get_direction_to_target(Feature target){
+    /**
+     * <p>
+     *     This method is used to find the Direction which leads to the target position.
+     *     It uses atan2 in order to calculate angle and from angle if uses GamestateMap
+     *     method getDirectionFromAngle which calculates Direction corresponding
+     *     to the given angle.
+     * </p>
+     * @param target Feature that drone wants to find the Direction to
+     * @return dir Direction which leads to the target position
+     */
+    private Direction getDirectionToTarget(Feature target){
         Point p = (Point) target.geometry();
-        double target_x = p.coordinates().get(0); //longitude = x
-        double target_y = p.coordinates().get(1); //latitude = y
-        double angle = Math.toDegrees(Math.atan2(target_y - position.latitude, target_x - position.longitude));
-        Direction dir = gameStateMap.get_direction_from_angle(angle);
-        return dir;
+        double targetLongitude = p.coordinates().get(0);
+        double targetLatitude = p.coordinates().get(1);
+        double angle = Math.toDegrees(Math.atan2(targetLatitude - position.latitude, targetLongitude - position.longitude));
+        return gameStateMap.getDirectionFromAngle(angle);
     }
 
-
-    public void add_path(){
-        Position[] arr = new Position[path.size()];
-        gameStateMap.add_flight_path(path.toArray(arr));
+    /**
+     * <p>
+     *     Method used to send the path of a drone to the GameStateMap.
+     *     GameStateMap's addFlightPath method adds the path to its
+     *     FeatureCollection features which represent the game map.
+     * </p>
+     */
+    public void addPathToMap(){
+        Position[] positions = new Position[previousPositions.size()];
+        gameStateMap.addFlightPath(previousPositions.toArray(positions));
     }
 
-    public void write_move(Position prev){
+    /**
+     * <p>
+     *     This method is called after each move of a drone.
+     *     It uses the fied writer to write its move to the .txt file.
+     * </p>
+     * @param prev previous Position of a drone which is needed in order
+     *             to write required information to the file
+     */
+    public void writeMoveToFile(Position prev){
         if(this.moves == 250) return; //System.exit(0);
-        writer.format("%f, %f, %s, %f, %f, %f, %f \n", prev.latitude, prev.longitude, last_dir.name(), position.latitude, position.longitude, coins, power);
-        System.out.printf("Current location: (%f,%f), Coins: %f, Power: %f, moved here by going: %s \n", position.latitude, position.longitude, coins, power, last_dir.name());
+        pathTxtWriter.format("%f, %f, %s, %f, %f, %f, %f \n", prev.latitude, prev.longitude, lastDirectionUsed.name(), position.latitude, position.longitude, coins, power);
+        System.out.printf("Current location: (%f,%f), Coins: %f, Power: %f, moved here by going: %s \n", position.latitude, position.longitude, coins, power, lastDirectionUsed.name());
     }
 
-    private void move_randomly(){
+    /**
+     * <p>
+     *     This method is used when drone empties is plan queue.
+     *     Meaning that it reached all the green stations and now
+     *     all the is left is to either move until it has moved 250
+     *     times or until is runs out of energy.
+     *     Goal is to move in random directions, but avoid red stations.
+     * </p>
+     */
+    private void moveRandomly(){
         if(moves > 250 || power < 1.25) return;
-        HashMap<Direction, Position> next_positions = gameStateMap.get_possible_positions(position);
-        Direction rand_dir = gameStateMap.get_random_direction(next_positions.keySet().size(), next_positions.keySet().toArray(new Direction[next_positions.keySet().size()]));
-        if(check_safety(rand_dir)){
-            Position prev = position;
+        HashMap<Direction, Position> possibleNextPositions = gameStateMap.getPossiblePositions(position);
+        Direction randomDirection = gameStateMap.getRandomDirection(possibleNextPositions.keySet().size(), possibleNextPositions.keySet().toArray(new Direction[possibleNextPositions.keySet().size()]));
+        if(checkSafetyOfDirection(randomDirection)){
+            Position previousPosition = position;
             moves++;
             power -= 1.25;
-            write_move(prev);
-            position = position.nextPosition(rand_dir);
-            path.add(position);
+            position = position.nextPosition(randomDirection);
+            writeMoveToFile(previousPosition);
+            previousPositions.add(position);
         }
-        move_randomly();
+        moveRandomly();
     }
 }

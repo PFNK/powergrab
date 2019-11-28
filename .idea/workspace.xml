@@ -2,32 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="438587f6-eaa0-4a99-8dfe-96851e175710" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/stateful-17-09-2019.geojson" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/stateful-17-09-2019.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/stateful-20-09-2019.geojson" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/stateful-20-09-2019.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/Game.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/uk/ac/ed/inf/powergrab/StatelessMapControllerTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stateful-21-09-2019.geojson" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/stateful-21-09-2019.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/App.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/Direction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/Direction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/GameMap.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/Drone.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/Drone.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/GameStateMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/GameStateMap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/Position.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/Position.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/StatefulDrone.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/StatefulDrone.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/StatelessDrone.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/StatelessDrone.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/StatelessMapController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/StatelessMapController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stateful-15-09-2019.geojson" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stateful-15-09-2019.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stateful-16-09-2019.geojson" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stateful-16-09-2019.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stateless-15-09-2019.geojson" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stateless-15-09-2019.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/uk/ac/ed/inf/powergrab/App.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/uk/ac/ed/inf/powergrab/App.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/uk/ac/ed/inf/powergrab/Direction.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/uk/ac/ed/inf/powergrab/Direction.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/uk/ac/ed/inf/powergrab/Drone.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/uk/ac/ed/inf/powergrab/Drone.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/uk/ac/ed/inf/powergrab/GameMap.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/uk/ac/ed/inf/powergrab/Position.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/uk/ac/ed/inf/powergrab/Position.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/uk/ac/ed/inf/powergrab/StatefulDrone.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/uk/ac/ed/inf/powergrab/StatefulDrone.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/uk/ac/ed/inf/powergrab/StatelessDrone.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/uk/ac/ed/inf/powergrab/StatelessDrone.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/uk/ac/ed/inf/powergrab/StatelessMapController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/uk/ac/ed/inf/powergrab/StatelessMapController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/uk/ac/ed/inf/powergrab/AppTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/uk/ac/ed/inf/powergrab/AppTest.class" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -43,6 +32,7 @@
       <list>
         <option value="Interface" />
         <option value="Class" />
+        <option value="JUnit3 Test Class" />
       </list>
     </option>
   </component>
@@ -58,11 +48,21 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
+    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit3" />
+    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit3" value="junit.framework.TestCase" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="vcs.Git" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="uk.ac.ed.inf.powergrab" />
+    </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="junit.framework.TestCase" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -80,7 +80,7 @@
     <configuration name="App" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="uk.ac.ed.inf.powergrab.App" />
       <module name="powergrab" />
-      <option name="PROGRAM_PARAMETERS" value="17 09 2019 55.944425 -3.188396 5678 stateful" />
+      <option name="PROGRAM_PARAMETERS" value="22 09 2019 55.944425 -3.188396 5678 stateful" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="uk.ac.ed.inf.powergrab.*" />
@@ -110,7 +110,10 @@
       <workItem from="1573635552357" duration="1000" />
       <workItem from="1574507514500" duration="3528000" />
       <workItem from="1574511467817" duration="6356000" />
-      <workItem from="1574518268072" duration="4962000" />
+      <workItem from="1574518268072" duration="5651000" />
+      <workItem from="1574605960375" duration="2184000" />
+      <workItem from="1574850975981" duration="5915000" />
+      <workItem from="1574949068895" duration="10068000" />
     </task>
     <servers />
   </component>
@@ -132,22 +135,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/StatelessMapController.java</url>
-          <line>129</line>
-          <option name="timeStamp" value="96" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/StatefulDrone.java</url>
-          <line>33</line>
-          <option name="timeStamp" value="120" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/powergrab$App.ic" NAME="App Coverage Results" MODIFIED="1574509052914" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
