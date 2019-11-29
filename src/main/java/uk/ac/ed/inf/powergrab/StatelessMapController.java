@@ -35,7 +35,7 @@ public class StatelessMapController {
 	public StatelessMapController(GameStateMap gameStateMap, Position position) {
 		this.gameStateMap = gameStateMap;
 		this.position = position;
-		path = new ArrayList<Position>();
+		path = new ArrayList<>();
 		lastDirectionUsed = null;
 		lastCollectedCoins = 0;
 		lastCollectedPower = 0;
@@ -51,29 +51,28 @@ public class StatelessMapController {
 	 * <p>
 	 *     It goes through all possible moves in which the drone can currently
 	 *     move and for each one it finds what are the reachable stations
-	 *     from there. After that it uses another method to choose from these
+	 *     from there. It stores only the closest green and red stations over
+	 *     all possible move, and also all directions that doesn't lead to
+	 *     any station. After that it uses another method to choose from these
 	 *     found stations.
 	 * </p>
 	 * @return suitable Direction which drone uses to move so it goes to the
 	 * 		   green stations nearby and avoid red stations nearby
 	 */
 	public Direction getDirectionToMove() {
-		// store only closest red, closest green and the rest 
 		HashMap<Direction, Position> possiblePositions = gameStateMap.getPossiblePositions(position);
-		HashMap<String, String> closestStations = new HashMap<String,String>();
+		HashMap<String, String> closestStations = new HashMap<>();
 		
-		HashMap<String, ArrayList<Direction>> directionsToClosestStations = new HashMap<String,ArrayList<Direction>>();
+		HashMap<String, ArrayList<Direction>> directionsToClosestStations = new HashMap<>();
 		double minGreenDist = 100000;
 		double minRedDist = 100000;
 		Direction minGreenDir = null;
 		Direction minRedDir = null;
-		ArrayList<Direction> safeDirections = new ArrayList<Direction>();
-		HashMap<String,Double> closestStationsCoinsPower = new HashMap<String,Double>();
+		ArrayList<Direction> safeDirections = new ArrayList<>();
+		HashMap<String,Double> closestStationsCoinsPower = new HashMap<>();
 		
-        // iterate through all possible directions
-		for(Entry<Direction, Position> nextPosition: possiblePositions.entrySet()) { // n<=16
-			// iterate though all features
-			for (Feature f: gameStateMap.features.features()){ // m=50
+		for(Entry<Direction, Position> nextPosition: possiblePositions.entrySet()) {
+			for (Feature f: gameStateMap.features.features()){
 				Geometry g = f.geometry();
 				if(g.type().equals("Point")){
 					
@@ -81,7 +80,7 @@ public class StatelessMapController {
 					Position stationPosition = new Position(stationPoint.coordinates().get(1),stationPoint.coordinates().get(0));
 					double distance = gameStateMap.calculateDistance(nextPosition.getValue(), stationPosition);
 				
-					if(distance > 0.00025) { //skip unreachable ones - include bad directions
+					if(distance > 0.00025) {
 						if(!safeDirections.contains(nextPosition.getKey())){
 							safeDirections.add(nextPosition.getKey());
 						}
@@ -101,6 +100,7 @@ public class StatelessMapController {
 							closestStations.put("greenStation",f.getProperty("id").getAsString());
 						}
 					}
+
 					else{
 						
 						if(distance < minRedDist) {
@@ -116,9 +116,9 @@ public class StatelessMapController {
 			}
 		}
 		
-		ArrayList<Direction> greenDirections = new ArrayList<Direction>();
+		ArrayList<Direction> greenDirections = new ArrayList<>();
 		greenDirections.add(minGreenDir);
-		ArrayList<Direction> redDirections = new ArrayList<Direction>();
+		ArrayList<Direction> redDirections = new ArrayList<>();
 		redDirections.add(minRedDir);
 		if (minRedDir != null){
 			safeDirections.removeIf(minRedDir::equals);
@@ -143,18 +143,21 @@ public class StatelessMapController {
 	 *     red station is chosen.
 	 * </p>
 	 * @param directionsToClosestStations HashMap where key is the type of a station/direction (green, safe, red)
-	 *                and value is a list of directions which belongs to this type
-	 *                green/red means that these directions leads to the green/red stations,
-	 *                and safe means that there is no station.
+	 *                                       and value is a list of directions which belongs to this type
+	 *                                       green/red means that these directions leads to the green/red stations,
+	 *                                       and safe means that there is no station.
 	 * @param closestStationsCoinsPower HashMap where value is the amount of coins or power that each
-	 *                    station from the directionsToClosestStations hashmap has. For example greenCoins
-	 *                    key has the value of coins that green station in directionsToClosestStations have.
+	 *                                     station from the directionsToClosestStations hashmap has.
+	 *                                     For example greenCoins key has the value of coins that green
+	 *                                     station in directionsToClosestStations have.
 	 * @param closestStations HashMap which stores the ids of the stations that are in
-	 *                         the directionsToClosestStations.
+	 *                           the directionsToClosestStations.
 	 * @return the best possible direction from the given directionsToClosestStations, depending on what
 	 * 		   is in the directionsToClosestStations hashmap
 	 */
-	public Direction chooseClosestStation(HashMap<String, ArrayList<Direction>> directionsToClosestStations, HashMap<String, Double> closestStationsCoinsPower, HashMap<String, String> closestStations) {
+	public Direction chooseClosestStation(HashMap<String, ArrayList<Direction>> directionsToClosestStations,
+										  HashMap<String, Double> closestStationsCoinsPower,
+										  HashMap<String, String> closestStations) {
 		Direction d = null;
 		if(directionsToClosestStations.get("green").get(0) != null) {
 			d = directionsToClosestStations.get("green").get(0);

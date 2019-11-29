@@ -3,7 +3,7 @@ package uk.ac.ed.inf.powergrab;
 /**
  * <h1>
  *     Position represents (latitude, longitude) double which is used
- *     as to locate drone and stations on the map.
+ *     to locate drone and stations on the map.
  * </h1>
  */
 public class Position {

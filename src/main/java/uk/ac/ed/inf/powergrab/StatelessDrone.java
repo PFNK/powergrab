@@ -42,7 +42,7 @@ public class StatelessDrone extends Drone {
 
 		coins += mapController.lastCollectedCoins;
 		power += mapController.lastCollectedPower;
-		moves++;
+		movesCount++;
 		power -= 1.25;
 
 		mapController.dronesPower = power;

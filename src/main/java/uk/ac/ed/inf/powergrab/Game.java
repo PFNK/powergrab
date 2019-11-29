@@ -54,7 +54,7 @@ public class Game implements AutoCloseable {
 
     /**
      * <p>
-     *     Main method that starts the game and runs until the game is finished:
+     *     Method that starts the game and runs until the game is finished:
      *     either 250 moves are made or drone run out of power.
      *     This method depends on the type of drone.
      * </p>
@@ -64,8 +64,8 @@ public class Game implements AutoCloseable {
     public void play() throws IOException {
         if(type.equals("stateless")) {
             StatelessMapController mapC = new StatelessMapController(gameStateMap, initialPosition);
-            StatelessDrone drone = new StatelessDrone(initialPosition,mapC);
-            while(drone.power > 1.25 && drone.moves < 250) {
+            StatelessDrone drone = new StatelessDrone(initialPosition, mapC);
+            while(drone.power > 1.25 && drone.movesCount < 250) {
                 Position prev = drone.position;
                 drone.move();
                 pathTxtWriter.format("%f, %f, %s, %f, %f, %f, %f \n", prev.latitude, prev.longitude, mapC.lastDirectionUsed.name(), drone.position.latitude, drone.position.longitude, drone.coins, drone.power);
@@ -81,7 +81,7 @@ public class Game implements AutoCloseable {
         if(type.equals("stateful")) {
             String file = String.format("%s-%s-%s-%s.txt", type, date[0], date[1], date[2]);
             StatefulDrone drone = new StatefulDrone(initialPosition, gameStateMap, file);
-            while(drone.power > 0 && drone.moves < 250) {
+            while(drone.power > 0 && drone.movesCount < 250) {
                 drone.move();
             }
             drone.addPathToMap();

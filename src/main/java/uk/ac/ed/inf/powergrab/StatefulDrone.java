@@ -22,28 +22,13 @@ import java.util.*;
  *     StatefulDrone extends Drone class which stores additional fields:
  *     coins, power, position and moves
  * </p>
-
  */
 public class StatefulDrone extends Drone {
-    /**
-     * The whole GameStateMap created by Game.
-     */
+
     GameStateMap gameStateMap;
-    /**
-     * Drone's game strategy = queue of green stations which StatefulDrone follows.
-     */
     Queue<Feature> planToFollow;
-    /**
-     * Previous positions of the drone, which are later added to the GameStateMap.
-     */
     ArrayList<Position> previousPositions;
-    /**
-     * Last direction that the drone moved.
-     */
     Direction lastDirectionUsed;
-    /**
-     * Writer used to write Drone's moves to the .txt file.
-     */
     PrintWriter pathTxtWriter;
 
 
@@ -51,7 +36,7 @@ public class StatefulDrone extends Drone {
         super(initialPosition);
         this.planToFollow = new LinkedList<>();
         this.gameStateMap = gameStateMap;
-        previousPositions = new ArrayList<Position>();
+        previousPositions = new ArrayList<>();
         lastDirectionUsed = null;
         findGamePlan();
         this.pathTxtWriter = new PrintWriter(file, "UTF-8");
@@ -82,7 +67,6 @@ public class StatefulDrone extends Drone {
             if(!isSafe) {
                 moveToAvoidRedStation(target);
             }
-//            if(power<=1.25) break;
             if(!position.nextPosition(dir).inPlayArea()){
                 double lessSteepAngle = dir.toAnticlockwiseAngle() - 30;
                 dir = gameStateMap.getDirectionFromAngle(lessSteepAngle);
@@ -94,14 +78,12 @@ public class StatefulDrone extends Drone {
             position = position.nextPosition(dir);
             previousPositions.add(position);
             distance = gameStateMap.calculateDistance(position, targetPosition);
-            moves++;
+            movesCount++;
 
         }
 
         coins += target.getProperty("coins").getAsDouble();
         power += target.getProperty("power").getAsDouble();
-
-//        take all coins/energy from it
         gameStateMap.updateStation(target.getProperty("id").getAsString(), 0, 0);
         planToFollow.remove();
     }
@@ -157,18 +139,17 @@ public class StatefulDrone extends Drone {
      * @return boolean which says if the direction is safe or not
      */
     private void moveToAvoidRedStation(Feature target){
-//        want to go in d direction - but its not safe - avoid by going to left/right
-        Direction d = getDirectionToTarget(target);
+        Direction directionToTarget = getDirectionToTarget(target);
 
-        if(moveToSidesToAvoid(d,90)) return; // try right direction
+        if(moveToSidesToAvoid(directionToTarget,90)) return; // try right direction
 
-        if(moveToSidesToAvoid(d,-90)) return; // try left then
+        if(moveToSidesToAvoid(directionToTarget,-90)) return; // try left then
 
 //      go back if previous don't work
-        double reverseAngle = (d.toAnticlockwiseAngle() - 180) % 360;
+        double reverseAngle = (directionToTarget.toAnticlockwiseAngle() - 180) % 360;
         Direction moveBackwardsDirection = gameStateMap.getDirectionFromAngle(reverseAngle);
         Position previousPosition = position;
-        moves++;
+        movesCount++;
         power -= 1.25;
         writeMoveToFile(previousPosition);
         position = position.nextPosition(moveBackwardsDirection);
@@ -213,17 +194,17 @@ public class StatefulDrone extends Drone {
 
 //        if(position.nextPosition(move_to_r_side).inPlayArea()){
 //            directions_to_move.add(move_to_r_side);
-//            move_to_avoid_red(d, directions_to_move);
+//            move_to_avoid_red(directionToTarget, directions_to_move);
 //        }
 //        else if(position.nextPosition(move_to_l_side).inPlayArea()){
 //            directions_to_move.add(move_to_l_side);
-//            move_to_avoid_red(d,directions_to_move);
+//            move_to_avoid_red(directionToTarget,directions_to_move);
 //        }
 ////        go back
 //        else{
-//            double reverseAngle = (d.to_anticlock_angle() - 180) % 360;
+//            double reverseAngle = (directionToTarget.to_anticlock_angle() - 180) % 360;
 //            Direction moveBackwards = gameStateMap.get_direction_from_angle(reverseAngle);
-//            avoid_these_directions.add(d);
+//            avoid_these_directions.add(directionToTarget);
 //            move_to_avoid_red(target, avoid_these_directions);
 //        }
     }
@@ -241,7 +222,7 @@ public class StatefulDrone extends Drone {
      * @return boolean false if this method failed to avoid an obstacle by moving in
      *                 direction of a given angle
      */
-    public boolean moveToSidesToAvoid(Direction target, int angle){
+    private boolean moveToSidesToAvoid(Direction target, int angle){
         double perpAngleToDesiredAngle = (target.toAnticlockwiseAngle() + angle) % 360;
         Direction moveToPerpSide = gameStateMap.getDirectionFromAngle(perpAngleToDesiredAngle);
 
@@ -250,7 +231,7 @@ public class StatefulDrone extends Drone {
         }
 
         Position previousPosition = position;
-        moves++;
+        movesCount++;
         power -= 1.25;
         position = position.nextPosition(moveToPerpSide);
         writeMoveToFile(previousPosition);
@@ -270,11 +251,12 @@ public class StatefulDrone extends Drone {
      *     its coins and power.
      * </p>
      */
-    public void checkGreenStationsNearby(){
+    private void checkGreenStationsNearby(){
         Feature closestGreenStation = findClosestGreenStation(gameStateMap.features, position);
         Point p = (Point) closestGreenStation.geometry();
         Position stationPosition = new Position(p.coordinates().get(1), p.coordinates().get(0));
         double distance = gameStateMap.calculateDistance(position, stationPosition);
+
         if(distance < 0.00025){
             coins += closestGreenStation.getProperty("coins").getAsDouble();
             power += closestGreenStation.getProperty("power").getAsDouble();
@@ -293,7 +275,7 @@ public class StatefulDrone extends Drone {
      *     which drone is going to follow when play() is called.
      * </p>
      */
-    public void findGamePlan(){
+    private void findGamePlan(){
         List<Feature> featureArrayList = new ArrayList<>(gameStateMap.features.features());
         FeatureCollection stations = FeatureCollection.fromFeatures(featureArrayList);
         Position position = this.position;
@@ -363,7 +345,7 @@ public class StatefulDrone extends Drone {
      *     FeatureCollection features which represent the game map.
      * </p>
      */
-    public void addPathToMap(){
+    private void addPathToMap(){
         Position[] positions = new Position[previousPositions.size()];
         gameStateMap.addFlightPath(previousPositions.toArray(positions));
     }
@@ -376,8 +358,8 @@ public class StatefulDrone extends Drone {
      * @param prev previous Position of a drone which is needed in order
      *             to write required information to the file
      */
-    public void writeMoveToFile(Position prev){
-        if(this.moves == 250) return; //System.exit(0);
+    private void writeMoveToFile(Position prev){
+        if(this.movesCount == 250) return; //System.exit(0);
         pathTxtWriter.format("%f, %f, %s, %f, %f, %f, %f \n", prev.latitude, prev.longitude, lastDirectionUsed.name(), position.latitude, position.longitude, coins, power);
         System.out.printf("Current location: (%f,%f), Coins: %f, Power: %f, moved here by going: %s \n", position.latitude, position.longitude, coins, power, lastDirectionUsed.name());
     }
@@ -392,12 +374,12 @@ public class StatefulDrone extends Drone {
      * </p>
      */
     private void moveRandomly(){
-        if(moves > 250 || power < 1.25) return;
+        if(movesCount > 250 || power < 1.25) return;
         HashMap<Direction, Position> possibleNextPositions = gameStateMap.getPossiblePositions(position);
         Direction randomDirection = gameStateMap.getRandomDirection(possibleNextPositions.keySet().size(), possibleNextPositions.keySet().toArray(new Direction[possibleNextPositions.keySet().size()]));
         if(checkSafetyOfDirection(randomDirection)){
             Position previousPosition = position;
-            moves++;
+            movesCount++;
             power -= 1.25;
             position = position.nextPosition(randomDirection);
             writeMoveToFile(previousPosition);
