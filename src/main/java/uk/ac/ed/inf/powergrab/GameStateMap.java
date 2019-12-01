@@ -24,21 +24,19 @@ import com.mapbox.geojson.*;
  * </p>
  */
 public class GameStateMap {
-	String[] date;
-	URL mapUrl;
 	FeatureCollection features;
 	Random random;
 	
 	public GameStateMap(String[] date, Random rnd) throws IOException {
-		this.date = date;
 		this.random = rnd;
 		String mapString = String.format("http://homepages.inf.ed.ac.uk/stg/powergrab/%s/%s/%s/powergrabmap.geojson", date[2], date[1], date[0]);
+		URL mapUrl;
 		try {
-	        this.mapUrl = new URL(mapString);
+	        mapUrl = new URL(mapString);
 	    } catch (IOException e) {
 	        throw new RuntimeException(e);
 	    }
-		HttpURLConnection conn = (HttpURLConnection) this.mapUrl.openConnection();
+		HttpURLConnection conn = (HttpURLConnection) mapUrl.openConnection();
 		conn.setReadTimeout(10000);
 		conn.setConnectTimeout(15000);
 		conn.setRequestMethod("GET");

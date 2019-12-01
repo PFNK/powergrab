@@ -11,8 +11,9 @@ public class App {
             System.exit(1);
         }
 
-        if(Integer.parseInt(args[0]) > 31 || Integer.parseInt(args[1]) > 12 || Integer.parseInt(args[2]) > 2019){
-            System.out.println("Incorrect date, please note that first 3 arguments represent day, month and year");
+        if(Integer.parseInt(args[0]) > 31 || Integer.parseInt(args[1]) > 12 || Integer.parseInt(args[2]) != 2019
+            || Integer.parseInt(args[0]) < 1 || Integer.parseInt(args[1]) < 1){
+            System.out.println("Incorrect date, please note that first three arguments represent day, month and year");
             System.exit(1);
         }
 

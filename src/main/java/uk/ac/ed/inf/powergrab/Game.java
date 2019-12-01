@@ -6,14 +6,14 @@ import java.io.PrintWriter;
 import java.util.Random;
 
 /**
- * <h1>PowerGrab Game</h1>
- * The Game program implements an application that allows user
- * to play PowerGrab game.
- * Given console arguments, it creates the Game instance based on them.
- * Game implements AutoCloseable interface which is used to close all files
- * that are being used here.
- * <p>
- * <b>Note:</b> Assumes that console arguments are given and are correct.
+ * <h1> PowerGrab Game </h1>
+ * <p1>
+ *     The Game program implements an application that allows user
+ *     to play PowerGrab game.
+ *     Given console arguments, it creates the Game instance based on them.
+ *     Game implements AutoCloseable interface which is used to close all files
+ *     that are being used here.
+ * </p1>
  */
 
 public class Game implements AutoCloseable {
@@ -69,9 +69,8 @@ public class Game implements AutoCloseable {
                 Position prev = drone.position;
                 drone.move();
                 pathTxtWriter.format("%f, %f, %s, %f, %f, %f, %f \n", prev.latitude, prev.longitude, mapC.lastDirectionUsed.name(), drone.position.latitude, drone.position.longitude, drone.coins, drone.power);
-                System.out.printf("Current location: (%f,%f), Coins: %f, Power: %f, moved here by going: %s \n", drone.position.latitude, drone.position.longitude, drone.coins, drone.power, mapC.lastDirectionUsed.name());
             }
-            mapC.addPath();
+            mapC.addPathToMap();
             String json = gameStateMap.features.toJson();
             pathGeojsonWriter.write(json);
             pathGeojsonWriter.flush();

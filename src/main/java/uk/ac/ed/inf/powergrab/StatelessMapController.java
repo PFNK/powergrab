@@ -20,11 +20,11 @@ import com.mapbox.geojson.Point;
  *     it access to the whole GameStateMap.
  * </p>
  */
-public class StatelessMapController {
+class StatelessMapController {
 
 	private GameStateMap gameStateMap;
 	Position position;
-	ArrayList<Position> path;
+	ArrayList<Position> previousPositions;
 	double lastCollectedCoins;
 	double lastCollectedPower;
 	Direction lastDirectionUsed;
@@ -32,10 +32,10 @@ public class StatelessMapController {
 	double dronesPower;
 
 	
-	public StatelessMapController(GameStateMap gameStateMap, Position position) {
+	StatelessMapController(GameStateMap gameStateMap, Position position) {
 		this.gameStateMap = gameStateMap;
 		this.position = position;
-		path = new ArrayList<>();
+		previousPositions = new ArrayList<>();
 		lastDirectionUsed = null;
 		lastCollectedCoins = 0;
 		lastCollectedPower = 0;
@@ -221,8 +221,8 @@ public class StatelessMapController {
 	 *     game is about to finish.
 	 * </p>
 	 */
-	public void addPath() {
-		Position[] positions = new Position[path.size()];
-		gameStateMap.addFlightPath(path.toArray(positions));
+	public void addPathToMap() {
+		Position[] positions = new Position[previousPositions.size()];
+		gameStateMap.addFlightPath(previousPositions.toArray(positions));
 	}
 }

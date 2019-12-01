@@ -38,7 +38,7 @@ public class StatelessDrone extends Drone {
 		Direction directionToMove = mapController.getDirectionToMove();
 		position = position.nextPosition(directionToMove);
 		mapController.position = position;
-		mapController.path.add(position);
+		mapController.previousPositions.add(position);
 
 		coins += mapController.lastCollectedCoins;
 		power += mapController.lastCollectedPower;

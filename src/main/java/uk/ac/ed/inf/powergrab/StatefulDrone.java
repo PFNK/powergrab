@@ -345,7 +345,7 @@ public class StatefulDrone extends Drone {
      *     FeatureCollection features which represent the game map.
      * </p>
      */
-    private void addPathToMap(){
+    public void addPathToMap(){
         Position[] positions = new Position[previousPositions.size()];
         gameStateMap.addFlightPath(previousPositions.toArray(positions));
     }

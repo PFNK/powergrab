@@ -3,9 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="438587f6-eaa0-4a99-8dfe-96851e175710" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/Drone.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/Drone.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/App.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/Game.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/Position.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/Position.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/GameStateMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/GameStateMap.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/StatefulDrone.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/StatefulDrone.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/StatelessDrone.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/StatelessDrone.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/StatelessMapController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/uk/ac/ed/inf/powergrab/StatelessMapController.java" afterDir="false" />
@@ -107,6 +107,10 @@
       <workItem from="1574850975981" duration="5915000" />
       <workItem from="1574949068895" duration="10907000" />
       <workItem from="1575033964965" duration="5114000" />
+      <workItem from="1575060825024" duration="132000" />
+      <workItem from="1575107915273" duration="2987000" />
+      <workItem from="1575192519939" duration="3191000" />
+      <workItem from="1575230733535" duration="2783000" />
     </task>
     <servers />
   </component>
